@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { Category } = require('./category.model');
 
 const productSchema = new mongoose.Schema({
-    name: { type: String, required: true },
+    name: { type: String, required: true, trim: true, unique: true, minlength: 3 },
     image: { type: String, required: true },
     images: [{ type: String, default: '' }],
     price : {type : Number, required : true},
@@ -14,6 +14,7 @@ const productSchema = new mongoose.Schema({
     rating: { type: Number, min: 0 },
     isFeatured: Boolean,
     createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date, default: Date.now },
 });
 
 exports.Product = mongoose.model('Product', productSchema);
