@@ -9,4 +9,6 @@ const addressSchema = mongoose.Schema({
     country: String,
     phone: String, 
 })
+// addressSchema.virtual('id').get(() => this._id.toHexString());
+// addressSchema.set('toJSON', { virtuals: true })
 exports.Address= mongoose.model('Address', addressSchema)

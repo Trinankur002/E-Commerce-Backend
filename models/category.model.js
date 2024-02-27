@@ -8,5 +8,7 @@ const categorySchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
+// categorySchema.virtual('id').get(() => this._id.toHexString());
+// categorySchema.set('toJSON', { virtuals: true })
 
 exports.Category = mongoose.model('Category', categorySchema);

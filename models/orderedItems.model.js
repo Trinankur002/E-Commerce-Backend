@@ -6,4 +6,6 @@ const orderedItemsSchema = mongoose.Schema({
     product: Product,
     quantity : Number,
 })
+// orderedItemsSchema.virtual('id').get(() => this._id.toHexString());
+// orderedItemsSchema.set('toJSON', { virtuals: true })
 exports.OrderedItems = mongoose.model('OrderedItems', orderedItemsSchema)

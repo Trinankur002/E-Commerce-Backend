@@ -1,12 +1,33 @@
 const express = require('express')
 require('dotenv/config')
+const mongoose = require('mongoose')
 const { Product } = require('../models/products.model')
 const {Category} = require('../models/category.model')
 const router = express.Router()
 
 router.get(`/`, async (req, res) => {
     try {
-        const productList = await Product.find()
+        // products?category={category_id},{category_id}
+        let filter = {}
+        if (req.query.category) {
+            filter= {category : req.query.category.split(',')}
+        }
+        const productList = await Product.find(filter).populate('category')
+        if (!productList) {
+            res.status(500).json({ success: false })
+        }
+        res.send(productList)
+    } catch (error) {
+        console.error(error); // Log the error for investigation
+        return await res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+})
+
+router.get(`/get/featured/:count?`, async (req, res) => {
+    try {
+        const count = req.params.count ? req.params.count : 1
+        // if (!count || count> Product.countDocuments((cnt) => cnt)){count : 1}
+        const productList = await Product.find({isFeatured: true}).limit(+count)
         if (!productList) {
             res.status(500).json({ success: false })
         }
@@ -32,9 +53,11 @@ router.get(`/namedescrionimage/`, async (req, res) => {
 
 router.post(`/`, async (req, res) => {
     try {
-        const category = await Category.findById(req.body.category);
-        if (!category) {
-            return await res.status(400).json({ success: false, message: 'Category with the ID not found' });
+        if (req.body.category) {
+            const category = await Category.findById(req.body.category);
+            if (!category) {
+                return await res.status(400).json({ success: false, message: 'Category with the ID not found' });
+        }
         }
         let product = await new Product({
             name: req.body.name,
@@ -61,6 +84,7 @@ router.post(`/`, async (req, res) => {
 
 router.get(`/find/:id`, async (req, res) => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid ID') }
         const product = await Product.findById(req.params.id).populate('category')
         if (!product) {
             res.status(500).json({ success: false })
@@ -74,6 +98,7 @@ router.get(`/find/:id`, async (req, res) => {
 
 router.put(`/:id`, async (req, res) => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid ID') }
         const category = await Category.findById(req.body.category);
         if (!category) {
             return await res.status(400).json({ success: false, message: 'Category with the ID not found' });
@@ -104,6 +129,7 @@ router.put(`/:id`, async (req, res) => {
 
 router.delete(`/:id`, async (req, res) => {
     try {
+        if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid ID')}
         const product = await Product.findById(req.params.id)
         if (!product) {
             res.status(500).json({ success: false })
