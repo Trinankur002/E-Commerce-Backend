@@ -69,7 +69,6 @@ router.put(`/:id`, async (req, res) => {
     }
 })
 
-
 router.delete(`/:id`,async (req, res) => {
     try {
         if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid ID') }

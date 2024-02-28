@@ -9,6 +9,7 @@ const productsRouter = require('./routes/products.routes')
 const categoriesRouter = require('./routes/categories.routes')
 const orderRouter = require('./routes/orders.routes')
 const userRouter = require('./routes/user.routes')
+const authJwt = require('./helper/jwt')
 
 // middlewares
 app.use(cors())
@@ -16,6 +17,14 @@ app.options('*', cors())
 
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
+app.use(authJwt())
+
+app.use((err, req, res, next) => {
+    if (err) {
+        res.status(500).json({ message: err })
+    }
+})
+
 
 //apis
 const api = process.env.API_URL
