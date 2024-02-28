@@ -99,6 +99,7 @@ router.put('/update/:id', async (req, res) => {
                     name: req.body.name,
                     phone: req.body.phone,
                     address: updatedAddress._id,
+                    updatedAt: Date.now(),
                 },
                 { new: true }
             );
@@ -112,6 +113,7 @@ router.put('/update/:id', async (req, res) => {
                 {
                     name: req.body.name,
                     phone: req.body.phone,
+                    updatedAt: Date.now(),
                 },
                 { new: true }
             );
@@ -166,5 +168,20 @@ router.post('/login', async (req, res) => {
         return res.status(500).json({ success: false, message: 'Internal server error' });
     }
 });
+
+router.put('/changeRole/:id', async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid Id') }
+        const user = await User.findById(req.params.id)
+        if (!user) { res.status(400).send('Invalid Id') }
+        user.isAdmin = req.body.isAdmin
+        await user.save
+        return await res.send(user)
+
+    } catch (error) {
+        console.log(error)
+        return await res.send(500).json({success: false, message: 'Internal server error'})
+    }
+})
 
 module.exports = router;

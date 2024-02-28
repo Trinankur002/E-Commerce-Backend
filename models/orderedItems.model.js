@@ -3,9 +3,7 @@ const { Product } = require('./products.model')
 
 const orderedItemsSchema = mongoose.Schema({
     // id: String,
-    product: Product,
-    quantity : Number,
+    product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product', required: true },
+    quantity: { type: Number, required: true },
 })
-// orderedItemsSchema.virtual('id').get(() => this._id.toHexString());
-// orderedItemsSchema.set('toJSON', { virtuals: true })
 exports.OrderedItems = mongoose.model('OrderedItems', orderedItemsSchema)
