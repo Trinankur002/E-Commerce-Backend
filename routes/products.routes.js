@@ -3,11 +3,11 @@ require('dotenv/config')
 const mongoose = require('mongoose')
 const { Product } = require('../models/products.model')
 const {Category} = require('../models/category.model')
+const authenticateToken = require('../helper/jwt')
 const router = express.Router()
 
 router.get(`/`, async (req, res) => {
     try {
-        // products?category={category_id},{category_id}
         let filter = {}
         if (req.query.category) {
             filter= {category : req.query.category.split(',')}
@@ -26,7 +26,6 @@ router.get(`/`, async (req, res) => {
 router.get(`/get/featured/:count?`, async (req, res) => {
     try {
         const count = req.params.count ? req.params.count : 1
-        // if (!count || count> Product.countDocuments((cnt) => cnt)){count : 1}
         const productList = await Product.find({isFeatured: true}).limit(+count)
         if (!productList) {
             res.status(500).json({ success: false })
@@ -51,13 +50,14 @@ router.get(`/namedescrionimage/`, async (req, res) => {
     }
 })
 
-router.post(`/`, async (req, res) => {
+router.post(`/`, authenticateToken, async (req, res) => {
     try {
+        if (!req.isAdmin) { return res.status(401).json({ success: false, message: 'Admin permission not allowed' }) }
         if (req.body.category) {
             const category = await Category.findById(req.body.category);
             if (!category) {
                 return await res.status(400).json({ success: false, message: 'Category with the ID not found' });
-        }
+            }
         }
         let product = await new Product({
             name: req.body.name,
@@ -72,7 +72,6 @@ router.post(`/`, async (req, res) => {
             rating: req.body.rating,
             isFeatured: req.body.isFeatured,
         })
-
         if (!product) { return res.status(400).send('product cannot be read or empty category') }
         product = await product.save()
         res.send(product)
@@ -96,8 +95,9 @@ router.get(`/find/:id`, async (req, res) => {
     }
 })
 
-router.put(`/:id`, async (req, res) => {
+router.put(`/:id`, authenticateToken, async (req, res) => {
     try {
+        if (!req.isAdmin) { return res.status(401).json({ success: false, message: 'Admin permission not allowed' }) }
         if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid ID') }
         const category = await Category.findById(req.body.category);
         if (!category) {
@@ -127,8 +127,9 @@ router.put(`/:id`, async (req, res) => {
     }
 })
 
-router.delete(`/:id`, async (req, res) => {
+router.delete(`/:id`, authenticateToken, async (req, res) => {
     try {
+        if (!req.isAdmin) { return res.status(401).json({ success: false, message: 'Admin permission not allowed' }) }
         if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid ID')}
         const product = await Product.findById(req.params.id)
         if (!product) {
@@ -141,6 +142,4 @@ router.delete(`/:id`, async (req, res) => {
         return await res.status(500).json({ success: false, message: 'Internal server error' });
     }
 })
-
-
 module.exports = router

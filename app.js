@@ -17,7 +17,6 @@ app.options('*', cors())
 
 app.use(bodyParser.json())
 app.use(morgan('tiny'))
-app.use(authJwt())
 
 app.use((err, req, res, next) => {
     if (err) {
@@ -26,7 +25,6 @@ app.use((err, req, res, next) => {
 })
 
 
-//apis
 const api = process.env.API_URL
 app.use(`${api}/products`, productsRouter)
 app.use(`${api}/categories`, categoriesRouter)

@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const { Category } = require('./category.model');
-const { json } = require('body-parser');
 
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true, trim: true, unique: true, minlength: 3 },
@@ -17,9 +15,5 @@ const productSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
 });
-
-// productSchema.virtual('id').get(function ({ return this._id.toHexString()}))
-// productSchema.virtual('id').get(() => this._id.toHexString());
-// productSchema.set('toJSON', {virtuals : true})
 
 exports.Product = mongoose.model('Product', productSchema);

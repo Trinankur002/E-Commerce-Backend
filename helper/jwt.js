@@ -1,26 +1,16 @@
-const expressJwt = require('express-jwt')
 require('dotenv/config')
-
-function authJwt() {
-    const secret = process.env.JWT_TOKEN
-    const api = process.env.API_URL
-    return expressJwt({
-        secret,
-        algorithms: ['HS256'],
-        isRevoked : isRevoked,
-    }).unless({
-        path: [
-            `${api}/user/login`,
-            `${api}/user/signup`,
-            { url: `${api}/products`, methods: ['GET'] },
-            { url: /\/api\/v1\/products(.*)/, methods: ['GET', 'OPTONS'] },
-            { url: /\/api\/v1\/categories(.*)/, methods: ['GET', 'OPTIONS'] },
-        ]
-    })
+const jwt = require('jsonwebtoken');
+async function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
+    try {
+        const decodedToken = await jwt.verify(token, process.env.JWT_TOKEN);
+        req.userId = decodedToken.userId;  // Set userId from the decoded token
+        req.isAdmin = decodedToken.isAdmin;  // Set isAdmin from the decoded token
+        next();
+    } catch (err) {
+        return res.sendStatus(403);
+    }
 }
-
-async function isRevoked(req, payload, done){
-    if (!payload.isAdmin) { done(null, true) }
-    done()
-}
-module.exports = authJwt
+module.exports = authenticateToken;

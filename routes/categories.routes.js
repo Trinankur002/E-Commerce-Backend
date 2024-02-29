@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const { Category } = require('../models/category.model')
+const authenticateToken = require('../helper/jwt')
 require('dotenv/config')
 const router = express.Router()
 
@@ -31,8 +32,9 @@ router.get(`/find/:id`, async (req, res) => {
     }
 })
 
-router.post(`/`, async (req, res) => {
+router.post(`/`, authenticateToken, async (req, res) => {
     try {
+        if (!req.isAdmin) { return res.status(401).json({ success: false, message: 'Admin permission not allowed' }) }
         let category = new Category({
             name: req.body.name,
             color: req.body.color,
@@ -40,7 +42,6 @@ router.post(`/`, async (req, res) => {
             image: req.body.image,
         })
         category = await category.save()
-
         if (!category) { return res.status(400).send('category cannot be read or empty category') }
         res.send(category)
     } catch (error) {
@@ -49,8 +50,9 @@ router.post(`/`, async (req, res) => {
     }
 })
 
-router.put(`/:id`, async (req, res) => {
+router.put(`/:id`, authenticateToken, async (req, res) => {
     try {
+        if (!req.isAdmin) { return res.status(401).json({ success: false, message: 'Admin permission not allowed' }) }
         if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid ID') }
         const category = await Category.findByIdAndUpdate(
             req.params.id,
@@ -69,8 +71,9 @@ router.put(`/:id`, async (req, res) => {
     }
 })
 
-router.delete(`/:id`,async (req, res) => {
+router.delete(`/:id`, authenticateToken, async (req, res) => {
     try {
+        if (!req.isAdmin) { return res.status(401).json({ success: false, message: 'Admin permission not allowed' }) }
         if (!mongoose.isValidObjectId(req.params.id)) { res.status(400).send('Invalid ID') }
         Category.findByIdAndDelete(req.params.id).then(category => {
             if (category) { return res.status(200).json({ success: true, message: 'the category is removed' }) }
@@ -81,5 +84,4 @@ router.delete(`/:id`,async (req, res) => {
         return await res.status(500).json({ success: false, message: 'Internal server error' });
     }
 })
-
 module.exports = router
