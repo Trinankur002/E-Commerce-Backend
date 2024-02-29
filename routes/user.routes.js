@@ -165,7 +165,7 @@ router.delete(`/:id`, async (req, res) => {
         await User.findOneAndDelete(req.params.id)
         res.send('user deleted successfully')
     } catch (error) {
-        console.error(error); // Log the error for investigation
+        console.error(error);  
         return await res.status(500).json({ success: false, message: 'Internal server error' });
     }
 })

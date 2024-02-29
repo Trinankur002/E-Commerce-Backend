@@ -13,7 +13,7 @@ router.get(`/`, async (req, res) => {
         }
         res.send(categoryList)
     } catch (error) {
-        console.error(error); // Log the error for investigation
+        console.error(error);  
         return await res.status(500).json({ success: false, message: 'Internal server error' });
     }
 })
@@ -27,7 +27,7 @@ router.get(`/find/:id`, async (req, res) => {
         }
         res.status(200).send(category)
     } catch (error) {
-        console.error(error); // Log the error for investigation
+        console.error(error);  
         return await res.status(500).json({ success: false, message: 'Internal server error' });
     }
 })
@@ -45,7 +45,7 @@ router.post(`/`, authenticateToken, async (req, res) => {
         if (!category) { return res.status(400).send('category cannot be read or empty category') }
         res.send(category)
     } catch (error) {
-        console.error(error); // Log the error for investigation
+        console.error(error);  
         return await res.status(500).json({ success: false, message: 'Internal server error' });
     }
 })
@@ -66,7 +66,7 @@ router.put(`/:id`, authenticateToken, async (req, res) => {
         if (!category) { return res.status(400).send('category cannot be read or empty category') }
         res.send(category)
     } catch (error) {
-        console.error(error); // Log the error for investigation
+        console.error(error);  
         return await res.status(500).json({ success: false, message: 'Internal server error' });
     }
 })
@@ -80,7 +80,7 @@ router.delete(`/:id`, authenticateToken, async (req, res) => {
             else { return res.status(404).json({ success: false, message: 'category of that id not found' }) }
         })
     } catch (error) {
-        console.error(error); // Log the error for investigation
+        console.error(error);  
         return await res.status(500).json({ success: false, message: 'Internal server error' });
     }
 })
